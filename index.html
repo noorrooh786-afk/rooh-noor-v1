@@ -24,12 +24,16 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        html {
+            scroll-behavior: smooth; /* Native smooth scroll, fallback for JS */
+        }
+
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
-            text-align: left; /* Strict left alignment for calm readability */
+            text-align: left;
         }
 
         /* Ambient Background Glows */
@@ -43,7 +47,7 @@
         .glow-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: rgba(212, 175, 55, 0.15); }
         .glow-2 { top: 40%; left: 20%; width: 40vw; height: 40vw; background: rgba(45, 106, 79, 0.1); }
 
-        /* 3D Glassmorphism Navbar */
+        /* --- Updated 3D Glassmorphism Navbar --- */
         nav {
             position: fixed;
             top: 0;
@@ -51,23 +55,36 @@
             width: 100%;
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            padding: 1.2rem 4rem;
+            justify-content: space-between;
+            /* Increased padding for larger brand area */
+            padding: 1.5rem 4rem; 
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 -1px 0 0 rgba(255,255,255,0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
 
-        .logo {
-            font-size: 1.8rem;
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+
+        .logo-nav-img {
+            /* INCREASED NAVBAR LOGO SIZE */
+            height: 50px; 
+            width: auto;
+            filter: drop-shadow(0 0 10px var(--gold-glow));
+        }
+
+        .logo-text {
+            font-size: 2rem; /* Slightly larger text */
             font-weight: 700;
             color: var(--gold-accent);
-            text-decoration: none;
             letter-spacing: 1px;
-            margin-right: 4rem;
             text-shadow: 0 0 15px var(--gold-glow);
         }
 
@@ -75,13 +92,14 @@
             display: flex;
             gap: 2.5rem;
             list-style: none;
+            align-items: center;
         }
 
         .nav-links a {
             color: var(--text-main);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .nav-links a:hover {
@@ -89,7 +107,28 @@
             text-shadow: 0 0 10px var(--gold-glow);
         }
 
-        /* Hero Section with 3D Element */
+        /* Hamburger Menu Icon */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 28px; /* Slightly larger */
+            height: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .menu-toggle span {
+            width: 100%;
+            height: 3px; /* Thicker lines */
+            background-color: var(--text-main);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        /* Hero Section */
         .hero {
             padding: 12rem 4rem 6rem;
             min-height: 100vh;
@@ -132,16 +171,17 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
         }
 
         .btn:hover {
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 25px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.3);
+            box-shadow: 0 10px 25px var(--gold-glow);
         }
 
-        /* 3D Floating Hero Card */
+        /* --- UPDATED Hero 3D Card: Sliding Transparency Effect --- */
         .hero-3d-card {
             position: absolute;
             top: 50%;
@@ -153,29 +193,80 @@
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             backdrop-filter: blur(20px);
-            box-shadow: 
-                -20px 20px 60px rgba(0, 0, 0, 0.8),
-                inset 0 0 20px rgba(212, 175, 55, 0.1);
+            box-shadow: -20px 20px 60px rgba(0, 0, 0, 0.8);
             padding: 3rem;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             animation: float 6s ease-in-out infinite;
+            
+            /* Required for the fade-out effect boundary */
+            overflow: hidden; 
         }
 
-        .hero-3d-card::before {
-            content: "Rooh Noor";
-            font-size: 2rem;
-            color: var(--gold-accent);
-            opacity: 0.2;
+        /* The fade-out boundary mask */
+        .hero-3d-card::after {
+            content: '';
             position: absolute;
-            top: 2rem;
-            left: 2rem;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40%; /* Only the top 40% will fade things out */
+            /* Gradient from fully transparent to background dark */
+            background: linear-gradient(to bottom, var(--bg-dark) 0%, rgba(10, 10, 12, 0) 100%);
+            z-index: 2; /* Sits above the logo */
+            pointer-events: none; /* Allows interaction 'through' the fade */
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        /* If user hovers card, maybe show logo more clearly by hiding the fade boundary */
+        /* .hero-3d-card:hover::after {
+            opacity: 0.1;
+        } */
+
+        /* INCREASED HERO CARD LOGO SIZE */
+        .logo-hero-card-img {
+            /* Size calculated to be very large on desktop */
+            width: calc(200px + 5vw); 
+            max-width: 320px;
+            height: auto;
+            position: absolute;
+            
+            /* Positioning logic for sliding animation */
+            top: 15%; /* Default center-top */
+            left: 50%;
+            transform: translateX(-50%);
+            
+            opacity: 0.8;
+            filter: drop-shadow(0 0 20px var(--gold-glow));
+            z-index: 1; /* Below the fade boundary mask */
+            
+            /* Smooth transitions for hover animation */
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s ease;
+        }
+
+        /* Hover interaction: Slide Up & Fade Out */
+        .hero-3d-card:hover .logo-hero-card-img {
+            /* Slide up past the edge of the card */
+            transform: translate(-50%, -150%); 
+            /* Increase transparency as it moves */
+            opacity: 0; 
+        }
+
+        .hero-3d-card h3 {
+            position: relative;
+            z-index: 3; /* Above the logo and fade boundary */
+        }
+
+        .hero-3d-card p {
+            position: relative;
+            z-index: 3;
         }
 
         @keyframes float {
             0% { transform: translateY(-50%) translateZ(0px); }
-            50% { transform: translateY(-53%) translateZ(20px); box-shadow: -25px 30px 70px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(212, 175, 55, 0.2); }
+            50% { transform: translateY(-53%) translateZ(20px); box-shadow: -25px 30px 70px rgba(0, 0, 0, 0.9); }
             100% { transform: translateY(-50%) translateZ(0px); }
         }
 
@@ -206,7 +297,7 @@
             padding: 2.5rem;
             border-radius: 12px;
             backdrop-filter: blur(10px);
-            transition: transform 0.4s ease, background 0.4s ease;
+            transition: all 0.4s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
@@ -232,11 +323,69 @@
             box-shadow: 0 0 40px var(--gold-glow);
         }
 
-        /* WhatsApp Floating Button (Anchored Left) */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .contact-logo-pane {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-left: 1px solid var(--glass-border);
+            padding-left: 3rem;
+        }
+
+        /* INCREASED CONTACT SECTION LOGO SIZE */
+        .logo-contact-img {
+            /* Best fit calculation: Large but capped */
+            width: calc(120px + 4vw); 
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 15px var(--gold-glow));
+        }
+
+        /* Social Media Links */
+        .social-profiles {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            color: var(--gold-accent);
+            border-color: var(--gold-accent);
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* WhatsApp Floating Button */
         .wa-float-container {
             position: fixed;
             bottom: 40px;
-            left: 40px; /* Kept left-aligned to match the UI flow */
+            left: 40px;
             z-index: 9999;
             display: flex;
             align-items: center;
@@ -248,7 +397,7 @@
             color: var(--text-main);
             padding: 8px 16px;
             border-radius: 20px;
-            margin-left: 15px; /* Spacing from the button */
+            margin-left: 15px;
             font-size: 0.9rem;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
@@ -290,27 +439,140 @@
             60% { transform: translateY(-5px); }
         }
 
+        /* ==========================================================================
+           RESPONSIVE MEDIA QUERIES
+           ========================================================================== */
+
+        @media (max-width: 1024px) {
+            nav { padding: 1.2rem 2rem; }
+            .logo-text { font-size: 1.8rem; }
+            .hero {
+                padding: 10rem 2rem 4rem;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .hero-content {
+                max-width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 4rem;
+            }
+            .hero h1 { font-size: 3.2rem; }
+            
+            /* Transform 3D card layout for tablet */
+            .hero-3d-card {
+                position: relative;
+                top: 0; left: 0;
+                transform: none;
+                width: 100%;
+                max-width: 450px;
+                height: 400px;
+                animation: none; 
+            }
+            /* Adjust logo size calculation for tablet card */
+            .logo-hero-card-img {
+                width: calc(150px + 10vw);
+                max-width: 280px;
+                top: 10%; /* Place higher on smaller card */
+            }
+
+            .section { padding: 4rem 2rem; }
+            .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .contact-logo-pane {
+                border-left: none;
+                border-top: 1px solid var(--glass-border);
+                padding-left: 0; padding-top: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Mobile Navbar Transformations */
+            .menu-toggle { display: flex; }
+            
+            /* Scale nav logo for best fit on narrow screens */
+            .logo-nav-img { height: 40px; }
+            .logo-text { font-size: 1.5rem; }
+
+            .nav-links {
+                position: fixed;
+                top: 0; right: -100%;
+                width: 75%; max-width: 300px;
+                height: 100vh;
+                background: rgba(10, 10, 12, 0.98);
+                backdrop-filter: blur(25px);
+                border-left: 1px solid var(--glass-border);
+                flex-direction: column;
+                justify-content: center;
+                gap: 2rem; padding: 2rem;
+                transition: right 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+                box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            }
+
+            .nav-links.active { right: 0; }
+
+            /* Hamburger Animation */
+            .menu-toggle.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); background-color: var(--gold-accent); }
+            .menu-toggle.active span:nth-child(2) { opacity: 0; }
+            .menu-toggle.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); background-color: var(--gold-accent); }
+
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1rem; }
+            .section-title { font-size: 2rem; }
+            .contact-box { padding: 2rem; }
+            .wa-float-container { bottom: 20px; left: 20px; }
+            .wa-button { width: 50px; height: 50px; font-size: 24px; }
+            .wa-tooltip { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            /* Strict Mobile Optimization */
+            .logo-text { font-size: 1.3rem; }
+            .logo-nav-img { height: 35px; border-radius : 20px; }
+            
+            .hero h1 { font-size: 2rem; }
+            .grid { grid-template-columns: 1fr; }
+            .glass-card { padding: 1.5rem; }
+            
+            /* Handle large logos carefully on very narrow screens */
+            .logo-hero-card-img {
+                width: 90%; /* Scale based on card width, not screen */
+                
+            }
+            .logo-contact-img {
+                width: 60%;
+                max-width: 150px;
+            }
+            
+            .social-profiles { justify-content: flex-start; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Ambient Lights -->
     <div class="ambient-glow glow-1"></div>
     <div class="ambient-glow glow-2"></div>
 
-    <!-- 3D Navbar -->
     <nav>
-        <a href="#" class="logo">RoohNoor</a>
-        <ul class="nav-links">
+        <a href="#" class="logo-container">
+            <img src="./assets/roohnoor_logo.png" alt="RoohNoor Icon" class="logo-nav-img" style="border-radius: 20px;">
+            <span class="logo-text">RoohNoor</span>
+        </a>
+        <button class="menu-toggle" id="mobile-menu-btn" aria-label="Toggle navigation menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <ul class="nav-links" id="nav-menu">
             <li><a href="#hero">Home</a></li>
             <li><a href="#services">Our Offerings</a></li>
-            <li><a href="#wisdom">Ancient Wisdom</a></li>
+            <li><a href="#guide">Guide Details</a></li>
             <li><a href="#testimonials">Testimonials</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
 
-    <!-- Hero Section -->
     <section id="hero" class="hero">
         <div class="hero-content">
             <h1>Awaken Your<br>Spiritual Destiny</h1>
@@ -318,14 +580,12 @@
             <a href="#contact" class="btn">Begin Your Healing</a>
         </div>
         
-        <!-- 3D Decorative Card -->
         <div class="hero-3d-card">
-            <h3 style="color: #f4f4f5; margin-bottom: 1rem; font-size: 1.8rem;">The Light Within</h3>
-            <p style="color: var(--text-muted);">"Nothing within me is mine, whatever exists is Yours."</p>
+            <div><img src="./assets/roohnoor_logo.png" alt="RoohNoor Decorative Logo" class="logo-hero-card-img" styles="z-index : 0"></div>
+            <h3>Spiritual Clarity Awaits</h3>
         </div>
     </section>
 
-    <!-- Services Section -->
     <section id="services" class="section">
         <h2 class="section-title">What We Do</h2>
         <div class="grid">
@@ -344,7 +604,16 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
+    <section id="guide" class="section">
+        <h2 class="section-title">Meet Your Guide</h2>
+        <div class="grid">
+            <div class="glass-card">
+                <h3>Fatima Sheikhh</h3>
+                <p>With over 15 years of experience in spiritual healing, Fatima Sheikhh has guided thousands towards clarity and peace. Her approach is deeply rooted in universal prayers that transcend religious boundaries.</p>
+            </div>
+        </div>
+    </section>
+
     <section id="testimonials" class="section">
         <h2 class="section-title">Voices of Grace</h2>
         <div class="grid">
@@ -361,34 +630,96 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
     <section id="contact" class="section">
         <div class="contact-box">
-            <h2 class="section-title" style="border: none; margin-bottom: 1rem;">Reach Out for Guidance</h2>
-            <p style="margin-bottom: 2rem;">Take the first step toward spiritual clarity. Our guides are available directly via WhatsApp to discuss your unique situation.</p>
-            <p style="margin-bottom: 1rem;"><strong>Email:</strong> noorrooh786@gmail.com</p>
-            <p style="margin-bottom: 2rem;"><strong>Hours:</strong> 10:00 AM - 7:00 PM (IST)</p>
-            <a href="https://wa.me/91XXXXXXXXXX" target="_blank" class="btn">Message on WhatsApp</a>
+            <div class="contact-grid">
+                <div>
+                    <h2 class="section-title" style="border: none; margin-bottom: 1rem;">Reach Out for Guidance</h2>
+                    <p style="margin-bottom: 2rem;">Take the first step toward spiritual clarity. Our guides are available directly via WhatsApp to discuss your unique situation.</p>
+                    <p style="margin-bottom: 1rem;"><strong>Email:</strong> noorrooh786@gmail.com</p>
+                    <p style="margin-bottom: 2rem;"><strong>Hours:</strong> 10:00 AM - 7:00 PM (IST)</p>
+                    
+                    <a href="https://wa.me/91XXXXXXXXXX" target="_blank" class="btn">Message on WhatsApp</a>
+
+                    <div class="social-profiles">
+                        <a href="https://instagram.com" target="_blank" class="social-icon" aria-label="Instagram Profile"><i class="fab fa-instagram"></i></a>
+                        <a href="https://facebook.com" target="_blank" class="social-icon" aria-label="Facebook Profile"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://linkedin.com" target="_blank" class="social-icon" aria-label="LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://youtube.com" target="_blank" class="social-icon" aria-label="YouTube Channel"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="contact-logo-pane">
+                    <img src="./assets/roohnoor_logo.png" alt="RoohNoor Branding Seal" class="logo-contact-img">
+                    <h3 style="color: var(--gold-accent); font-size: 1.6rem;">RoohNoor</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem;">Universal Spiritual Solutions</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Floating WhatsApp Button (Anchored Left) -->
     <div class="wa-float-container">
-        <a href="https://wa.me/91XXXXXXXXXX" target="_blank" class="wa-button">
+        <a href="https://wa.me/91XXXXXXXXXX" target="_blank" class="wa-button" aria-label="Direct WhatsApp Link">
             <i class="fab fa-whatsapp"></i>
         </a>
         <div class="wa-tooltip">Talk to us on WhatsApp</div>
     </div>
 
-    <!-- Smooth Scrolling JS -->
     <script>
+        // Smooth Scrolling Script (Enhanced with offset for the fixed header)
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const targetId = this.getAttribute('href');
+                if (targetId === "#") return; // Skip empty links
+
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    const headerOffset = 100; // Approximated height of the fixed navbar
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
             });
+        });
+
+        // Responsive Hamburger Navigation Engine
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const navMenu = document.getElementById('nav-menu');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        function toggleMenu() {
+            mobileMenuBtn.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            
+            // Prevent scrolling on the body when menu is open
+            if(navMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMenu);
+
+        // Close menu whenever a link is selected
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu.classList.contains('active')) {
+                    toggleMenu();
+                }
+            });
+        });
+
+        // Optional: Close menu when clicking outside the links drawer
+        window.addEventListener('click', (e) => {
+            if(navMenu.classList.contains('active') && !navMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                toggleMenu();
+            }
         });
     </script>
 </body>
